@@ -73,10 +73,12 @@ onBeforeRouter = function () {
 
     //console.log( "[PageController : before-router]" );
 
-    // @update: Fire transition out before request cycle begins with Router
-    _instance.fire( (_eventPrefix + "router-transition-out") );
+    if ( !_isFirstRoute ) {
+        // @update: Fire transition out before request cycle begins with Router
+        _instance.fire( (_eventPrefix + "router-transition-out") );
 
-    //console.log( "[PageController : router-transition-out]" );
+        //console.log( "[PageController : router-transition-out]" );
+    }
 },
 
 
@@ -334,6 +336,10 @@ PageController.prototype.setConfig = function ( config ) {
  *
  */
 PageController.prototype.setModules = function ( modules ) {
+    if ( !modules ) {
+        return;
+    }
+
     for ( var i = modules.length; i--; ) {
         this.addModule( modules[ i ] );
     }
