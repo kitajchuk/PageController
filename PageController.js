@@ -27,7 +27,7 @@ var _router = null,
     _initialized = false,
     _timeBefore = null,
     _timeDelay = 600,
-    _timeToIdle = 1000,
+    _timeToIdle = 30000,
     _timeStamp = null,
     _eventPrefix = "page-controller-",
     _currentRoute = null,
@@ -60,6 +60,7 @@ exec = function ( method ) {
 
 /**
  * @fires page-controller-before-router
+ * @fires page-controller-transition-out
  */
 onBeforeRouter = function () {
     if ( _instance._anchorTop ) {
@@ -71,6 +72,11 @@ onBeforeRouter = function () {
     _instance.fire( (_eventPrefix + "before-router") );
 
     //console.log( "[PageController : before-router]" );
+
+    // @update: Fire transition out before request cycle begins with Router
+    _instance.fire( (_eventPrefix + "router-transition-out"), data );
+
+    //console.log( "[PageController : router-transition-out]" );
 },
 
 
@@ -140,10 +146,8 @@ syncModules = function ( callback ) {
 
 
 /**
- * @fires page-controller-router-teardown
  * @fires page-controller-router-transition-out
  * @fires page-controller-router-transition-in
- * @fires page-controller-router-transition-cleanup
  * @fires page-controller-router-idle
  */
 handleRouterResponse = function ( res ) {
@@ -172,17 +176,8 @@ handleRouterResponse = function ( res ) {
         return;
     }
 
-    // Allow extra module teardown
-    _instance.fire( (_eventPrefix + "router-teardown"), data );
-
-    //console.log( "[PageController : router-teardown]" );
-
     // Sync all modules - they must all respond to proceed
     syncModules(function () {
-        _instance.fire( (_eventPrefix + "router-transition-out"), data );
-
-        //console.log( "[PageController : router-transition-out]" );
-
         // Stage time before transition back in
         setTimeout(function () {
             if ( _instance._anchorTop ) {
@@ -198,8 +193,6 @@ handleRouterResponse = function ( res ) {
             exec( "onload" );
 
             setTimeout(function () {
-                 _instance.fire( (_eventPrefix + "router-transition-cleanup"), data );
-
                  //console.log( "[PageController : router-transition-cleanup]" );
 
                 // Idle state

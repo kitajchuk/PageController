@@ -18,7 +18,10 @@ var pageController = new PageController({
     // Pull page back to top on changes
     anchorTop: true,
 
-    // How long are your transitions between pages
+    // How long are your transitions between pages?
+    // If a request happens faster than your beautiful transitions,
+    // the page controller will still wait until your duration is up to
+    // fire off the transition-in sequence.
     transitionTime: 600
 });
 
@@ -62,10 +65,8 @@ pageController.on( "page-controller-router-transition-in", function ( data ) {
 - page-controller-before-router
 - page-controller-after-router
 - page-controller-router-samepage
-- page-controller-router-teardown
 - page-controller-router-transition-out
 - page-controller-router-transition-in
-- page-controller-router-transition-cleanup
 - page-controller-router-idle
 
 

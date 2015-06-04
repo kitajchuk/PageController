@@ -2,7 +2,7 @@
     "title": "PageController",
     "name": "properjs-pagecontroller",
     "description": "Asynchronous webpage transitioning with pushstate management.",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "homepage": "https://github.com/ProperJS/PageController",
     "readmeFilename": "README.md",
     "contributors": [
@@ -51,6 +51,7 @@
         "properjs-matchelement": "~0.1"
     },
     "keywords": [
+        "properjs",
         "raf",
         "event",
         "requestanimationframe",
