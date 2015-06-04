@@ -74,7 +74,7 @@ onBeforeRouter = function () {
     //console.log( "[PageController : before-router]" );
 
     // @update: Fire transition out before request cycle begins with Router
-    _instance.fire( (_eventPrefix + "router-transition-out"), data );
+    _instance.fire( (_eventPrefix + "router-transition-out") );
 
     //console.log( "[PageController : router-transition-out]" );
 },
