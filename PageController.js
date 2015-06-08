@@ -33,6 +33,7 @@ var _router = null,
     _currentRoute = null,
     _isFirstRoute = true,
     _currentQuery = null,
+    _currentToString = null,
     _isSamePage = false,
 
     // Singleton
@@ -114,15 +115,29 @@ syncModules = function ( callback ) {
 },
 
 
+getRouteDataToString = function ( data ) {
+    var ret = data.uri,
+        i;
+
+    for ( i in data.query ) {
+        ret += "-" + i + "-" + data.query[ i ];
+    }
+
+    for ( i in data.params ) {
+        ret += "-" + i + "-" + data.params[ i ];
+    }
+
+    return ret;
+},
+
+
 /**
  * @fires page-controller-transition-out
  */
 onPreGetRouter = function ( data ) {
-    var isSameRoute = (_currentRoute === data.uri),
-        isQueried = (!isSameObject( data.query, {} )),
-        isQuerySame = (isSameObject( data.query, _currentQuery ));
+    var isSameRequest = _currentToString === getRouteDataToString( data );
 
-    if ( isQueried && (isSameRoute && isQuerySame) || !isQueried && !_currentQuery && isSameRoute ) {
+    if ( isSameRequest ) {
         //console.log( "PageController : same page" );
         _instance.fire( (_eventPrefix + "router-samepage"), data );
         _isSamePage = true;
@@ -164,6 +179,7 @@ handleRouterResponse = function ( res ) {
 
     _currentRoute = data.request.uri;
     _currentQuery = data.request.query;
+    _currentToString = getRouteDataToString( data.request );
 
     if ( _isFirstRoute ) {
         _isFirstRoute = false;
