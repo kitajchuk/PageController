@@ -63,6 +63,7 @@ pageController.on( "page-controller-router-transition-in", function ( data ) {
 
 ## Events
 - page-controller-router-samepage
+- page-controller-router-preget
 - page-controller-router-transition-out
 - page-controller-router-transition-in
 - page-controller-router-idle

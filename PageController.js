@@ -122,7 +122,7 @@ onPreGetRouter = function ( data ) {
         isQueried = (!isSameObject( data.query, {} )),
         isQuerySame = (isSameObject( data.query, _currentQuery ));
 
-    if ( isQueried && (isSameRoute && isQuerySame) || !isQueried && isSameRoute ) {
+    if ( isQueried && (isSameRoute && isQuerySame) || !isQueried && !_currentQuery && isSameRoute ) {
         //console.log( "PageController : same page" );
         _instance.fire( (_eventPrefix + "router-samepage"), data );
         _isSamePage = true;
@@ -139,7 +139,7 @@ onPreGetRouter = function ( data ) {
 
     if ( !_isFirstRoute ) {
         // @update: Fire transition out before request cycle begins with Router
-        _instance.fire( (_eventPrefix + "router-transition-out") );
+        _instance.fire( (_eventPrefix + "router-transition-out"), data );
 
         //console.log( "[PageController : router-transition-out]" );
     }
