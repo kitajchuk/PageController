@@ -62,8 +62,6 @@ pageController.on( "page-controller-router-transition-in", function ( data ) {
 
 
 ## Events
-- page-controller-before-router
-- page-controller-after-router
 - page-controller-router-samepage
 - page-controller-router-transition-out
 - page-controller-router-transition-in

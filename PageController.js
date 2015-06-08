@@ -33,6 +33,7 @@ var _router = null,
     _currentRoute = null,
     _isFirstRoute = true,
     _currentQuery = null,
+    _isSamePage = false,
 
     // Singleton
     _instance = null,
@@ -55,40 +56,6 @@ exec = function ( method ) {
             _modules[ i ][ method ].call( _modules[ i ] );
         }
     }
-},
-
-
-/**
- * @fires page-controller-before-router
- * @fires page-controller-transition-out
- */
-onBeforeRouter = function () {
-    if ( _instance._anchorTop ) {
-        window.scrollTo( 0, 0 );
-    }
-
-    _timeBefore = Date.now();
-
-    _instance.fire( (_eventPrefix + "before-router") );
-
-    //console.log( "[PageController : before-router]" );
-
-    if ( !_isFirstRoute ) {
-        // @update: Fire transition out before request cycle begins with Router
-        _instance.fire( (_eventPrefix + "router-transition-out") );
-
-        //console.log( "[PageController : router-transition-out]" );
-    }
-},
-
-
-/**
- * @fires page-controller-after-router
- */
-onAfterRouter = function () {
-    _instance.fire( (_eventPrefix + "after-router") );
-
-    //console.log( "[PageController : after-router]" );
 },
 
 
@@ -148,25 +115,52 @@ syncModules = function ( callback ) {
 
 
 /**
- * @fires page-controller-router-transition-out
- * @fires page-controller-router-transition-in
- * @fires page-controller-router-idle
+ * @fires page-controller-transition-out
  */
-handleRouterResponse = function ( res ) {
-    var data = {
-            response: res.response.responseText,
-            request: res.request,
-            status: res.status
-        },
-        isSameRoute = (_currentRoute === data.request.uri),
-        isQueried = (!isSameObject( data.request.query, {} )),
-        isQuerySame = (isSameObject( data.request.query, _currentQuery ));
+onPreGetRouter = function ( data ) {
+    var isSameRoute = (_currentRoute === data.uri),
+        isQueried = (!isSameObject( data.query, {} )),
+        isQuerySame = (isSameObject( data.query, _currentQuery ));
 
     if ( isQueried && (isSameRoute && isQuerySame) || !isQueried && isSameRoute ) {
         //console.log( "PageController : same page" );
         _instance.fire( (_eventPrefix + "router-samepage"), data );
+        _isSamePage = true;
         return;
     }
+
+    if ( _instance._anchorTop ) {
+        window.scrollTo( 0, 0 );
+    }
+
+    _timeBefore = Date.now();
+
+    //console.log( "[PageController : before-router]" );
+
+    if ( !_isFirstRoute ) {
+        // @update: Fire transition out before request cycle begins with Router
+        _instance.fire( (_eventPrefix + "router-transition-out") );
+
+        //console.log( "[PageController : router-transition-out]" );
+    }
+},
+
+
+/**
+ * @fires page-controller-router-transition-in
+ * @fires page-controller-router-idle
+ */
+handleRouterResponse = function ( res ) {
+    if ( _isSamePage ) {
+        _isSamePage = false;
+        return;
+    }
+
+    var data = {
+        response: res.response.responseText,
+        request: res.request,
+        status: res.status
+    };
 
     _currentRoute = data.request.uri;
     _currentQuery = data.request.query;
@@ -308,8 +302,7 @@ PageController.prototype.initPage = function () {
             _router.get( _config[ i ], onRouterResponse );
         }
     
-        _router.on( "beforeget", onBeforeRouter );
-        _router.on( "afterget", onAfterRouter );
+        _router.on( "preget", onPreGetRouter );
     
         exec( "init" );
     }
