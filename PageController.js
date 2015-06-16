@@ -131,6 +131,16 @@ getRouteDataToString = function ( data ) {
 },
 
 
+onPopGetRouter = function ( data ) {
+    onPreGetRouter( data.request );
+
+    setTimeout( function () {
+        handleRouterResponse( data );
+
+    }, _instance._transitionTime );
+},
+
+
 /**
  * @fires page-controller-transition-out
  */
@@ -319,6 +329,7 @@ PageController.prototype.initPage = function () {
         }
     
         _router.on( "preget", onPreGetRouter );
+        _router.on( "popget", onPopGetRouter );
     
         exec( "init" );
     }
