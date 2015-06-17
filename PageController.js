@@ -145,7 +145,7 @@ onPopGetRouter = function ( data ) {
  * @fires page-controller-transition-out
  */
 onPreGetRouter = function ( data ) {
-    var isSameRequest = _currentToString === getRouteDataToString( data );
+    var isSameRequest = (_currentToString === getRouteDataToString( data ) && data.route !== "*");
 
     if ( isSameRequest ) {
         //console.log( "PageController : same page" );
