@@ -460,6 +460,32 @@ PageController.prototype.getRouter = function () {
 
 /**
  *
+ * Returns the instances PushState
+ * @memberof PageController
+ * @method getPusher
+ * @returns PushState
+ *
+ */
+PageController.prototype.getPusher = function () {
+    return _router._pusher;
+};
+
+
+/**
+ *
+ * Returns the instances MatchRoute
+ * @memberof PageController
+ * @method getMatcher
+ * @returns MatchRoute
+ *
+ */
+PageController.prototype.getMatcher = function () {
+    return _router._matcher;
+};
+
+
+/**
+ *
  * Returns the current route pathed
  * @memberof PageController
  * @method getRoute
