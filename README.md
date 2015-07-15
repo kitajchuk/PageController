@@ -1,7 +1,7 @@
 PageController
 ==============
 
-> Asynchronous webpage transitioning with pushstate management.
+> Lightweight, async web app management with routing and history.
 
 
 
@@ -18,14 +18,19 @@ npm install properjs-pagecontroller
 Create a new instance of PageController.
 ```javascript
 var pageController = new PageController({
-    // Pull page back to top on changes
-    anchorTop: true,
-
     // How long are your transitions between pages?
     // If a request happens faster than your beautiful transitions,
     // the page controller will still wait until your duration is up to
     // fire off the transition-in sequence.
-    transitionTime: 600
+    transitionTime: 600,
+
+    // Router options
+    // These are the defaults that PageController uses
+    routerOptions: {
+        async: true,
+        caching: true,
+        preventDefault: true
+    }
 });
 ```
 
@@ -47,7 +52,7 @@ pageController.setConfig([
 ```
 
 ### Bind Modules
-Bind the modules you want PageController to sync with. Consider these to be "PageController Modules". They behave a certain way. See the [Midnight Collective](https://github.com/kitajchuk/midnight-collective-squarespace) project as a best in class example of using PageController. This example happens to be a [Grunt Nautilus](https://github.com/kitajchuk/grunt-nautilus) app, but you can roll PageController in any setup you see fit.
+Bind the modules you want PageController to sync with. Consider these to be registered "PageController Modules".
 ```javascript
 // Bind modules to represent
 pageController.setModules([
@@ -56,7 +61,13 @@ pageController.setModules([
 ```
 
 ### Module Layout
-PageController friendly modules look a certain way. By using a normalized api for these modules, PageController can consume them. It then binds and unbinds them as needed as your app functions. This is an example of a module in a theoretical, but practical app atmosphere that would sync with PageController. Using the `onload` method, a module examines the DOM and can determine whether it should load listeners or not. With the `unload` method, a module tears itself down, unbinding all events and allowing variables to be garbage collected when not in use.
+PageController friendly modules look a certain way. By using a normalized api for these modules, PageController can consume them. By setting these methods up correctly, PageController can handle activating/deactivating modules as your app performs. This is a breakdown of the base methods for a PageController module:
+
+- init() - optional, use it to perform one-off page load actions
+- isActive() - required, use it to determine whether a module should currently be active
+- onload() - required, use it to start a module, setting stuff up and binding events
+- unload() - required, use it to stop a module, tearing stuff down and unbinding events
+
 ```javascript
 /*!
  *
@@ -75,7 +86,6 @@ var $_jsFeed = null,
     $_jsItems = null,
 
     _isActive = false,
-    _isLoaded = false,
 
 
 /**
@@ -90,27 +100,11 @@ feed = {
 
 
     isActive: function () {
-        return _isActive;
-    },
-
-
-    isLoaded: function () {
-        return _isLoaded;
+        return (_isActive = this.getElements() > 0);
     },
 
 
     onload: function () {
-        _isActive = this.getElements();
-
-        if ( _isLoaded ) {
-            return;
-
-        } else if ( !_isActive ) {
-            return;
-        }
-
-        _isLoaded = true;
-
         emitter.on( "app--scroll", onScroller );
     },
 
@@ -135,7 +129,6 @@ feed = {
         $_jsItems = null;
 
         _isActive = false;
-        _isLoaded = false;
 
         emitter.off( "app--scroll", onScroller );
     }
@@ -166,6 +159,12 @@ pageController.on( "page-controller-router-transition-out", function () {
     // This is a great place for CSS class-hooks to achieve nice page transitions
 });
 
+
+pageController.on( "page-controller-router-transition-out", function ( html ) {
+    // Refresh the document content for the new page
+    // You'll need to parse your content from the responseText string
+});
+
 pageController.on( "page-controller-router-transition-in", function ( data ) {
     // Transition in your page back in after the content is updated
     // data.status          => number
@@ -191,6 +190,8 @@ pageController.initPage();
 ## Events
 - page-controller-router-samepage
 - page-controller-router-preget
+- page-controller-router-synced-modules
+- page-controller-router-refresh-document
 - page-controller-router-transition-out
 - page-controller-router-transition-in
 - page-controller-router-idle
@@ -205,8 +206,6 @@ pageController.initPage();
 - setModules( array )
 - addModule( object )
 - unregisterModule( object )
-- getActiveModules()
-- getLoadedModules()
 - getModules()
 - getConfig()
 - [getRouter()](https://github.com/ProperJS/Router)
