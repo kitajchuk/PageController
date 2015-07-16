@@ -110,9 +110,7 @@ feed = {
 
 
     unload: function () {
-        if ( _isLoaded ) {
-            this.teardown();
-        }
+        this.teardown();
     },
 
 
