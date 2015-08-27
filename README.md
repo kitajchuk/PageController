@@ -8,7 +8,7 @@ PageController
 ## Installation
 
 ```shell
-npm install properjs-pagecontroller
+npm install properjs-pagecontroller --save-dev
 ```
 
 
@@ -17,21 +17,22 @@ npm install properjs-pagecontroller
 ### New PageController
 Create a new instance of PageController.
 ```javascript
-var pageController = new PageController({
-    // How long are your transitions between pages?
-    // If a request happens faster than your beautiful transitions,
-    // the page controller will still wait until your duration is up to
-    // fire off the transition-in sequence.
-    transitionTime: 600,
-
-    // Router options
-    // These are the defaults that PageController uses
-    routerOptions: {
-        async: true,
-        caching: true,
-        preventDefault: true
-    }
-});
+var PageController = require( "properjs-pagecontroller" ),
+    pageController = new PageController({
+        // How long are your transitions between pages?
+        // If a request happens faster than your beautiful transitions,
+        // the page controller will still wait until your duration is up to
+        // fire off the transition-in sequence.
+        transitionTime: 600,
+    
+        // Router options
+        // These are the defaults that PageController uses
+        routerOptions: {
+            async: true,
+            caching: true,
+            preventDefault: true
+        }
+    });
 ```
 
 ### Route Configuration

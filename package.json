@@ -2,7 +2,7 @@
     "title": "PageController",
     "name": "properjs-pagecontroller",
     "description": "Lightweight, async web app management with routing and history.",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "homepage": "https://github.com/ProperJS/PageController",
     "readmeFilename": "README.md",
     "contributors": [
@@ -27,35 +27,16 @@
     ],
     "main": "PageController",
     "scripts": {
-        "prepublish": "properjs"
-    },
-    "properjs": {
-        "dependencies": [
-            "properjs-raf",
-            "properjs-controller",
-            "properjs-router",
-            "properjs-pushstate",
-            "paramalama",
-            "properjs-matchroute",
-            "properjs-matchelement"
-        ],
-        "output": "dist/PageController.js"
+        "test": "webpack test/test.js test/dist/common.js ; cp PageController.js test/dist/browser.js"
     },
     "dependencies": {
-        "properjs-raf": "~0.1",
-        "properjs-controller": "~0.1",
-        "properjs-router": "~0.1",
-        "properjs-pushstate": "~0.1",
-        "paramalama": "~0.1",
-        "properjs-matchroute": "~0.1",
-        "properjs-matchelement": "~0.1"
+        "properjs-controller": "~0.2",
+        "properjs-router": "~0.2"
     },
     "keywords": [
         "properjs",
-        "raf",
-        "event",
-        "requestanimationframe",
-        "async",
-        "ajax"
+        "router",
+        "history",
+        "pushState"
     ]
 }
