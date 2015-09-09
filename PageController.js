@@ -38,7 +38,6 @@
         _initialized = false,
         _timeBefore = null,
         _timeDelay = 600,
-        _timeStamp = null,
         _eventPrefix = "page-controller-",
         _currentRoute = null,
         _isFirstRoute = true,
@@ -135,7 +134,7 @@
     
     onRouterResponse = function ( data ) {
         function __route() {
-            if ( (Date.now() - _timeStamp) >= _instance._transitionTime ) {
+            if ( (Date.now() - _timeBefore) >= _instance._transitionTime ) {
                 _instance.stop();
     
                 handleRouterResponse( data );
