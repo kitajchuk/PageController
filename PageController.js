@@ -492,6 +492,18 @@
         return ret;
     };
     
+    
+    /**
+     *
+     * Flushes the current route known as `active`
+     * @memberof PageController
+     * @method flushRoute
+     *
+     */
+    PageController.prototype.flushRoute = function () {
+        _currentToString = "";
+    };
+    
     return PageController;
 
 });

@@ -211,3 +211,4 @@ pageController.initPage();
 - [getMatcher()](https://github.com/ProperJS/MatchRoute)
 - getRoute()
 - getQuery()
+- flushRoute()
