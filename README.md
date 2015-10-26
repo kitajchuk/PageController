@@ -159,7 +159,7 @@ pageController.on( "page-controller-router-transition-out", function () {
 });
 
 
-pageController.on( "page-controller-router-transition-out", function ( html ) {
+pageController.on( "page-controller-router-refresh-document", function ( html ) {
     // Refresh the document content for the new page
     // You'll need to parse your content from the responseText string
 });
@@ -193,7 +193,6 @@ pageController.initPage();
 - page-controller-router-refresh-document
 - page-controller-router-transition-out
 - page-controller-router-transition-in
-- page-controller-router-idle
 
 
 
