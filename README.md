@@ -212,3 +212,4 @@ pageController.initPage();
 - getRoute()
 - getQuery()
 - flushRoute()
+- routeSilently( uri, callback )

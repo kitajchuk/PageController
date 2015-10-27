@@ -44,12 +44,21 @@
         _currentQuery = null,
         _currentToString = null,
         _isSamePage = false,
+        _silentMode = false,
+        _silentCallback = null,
     
         // Singleton
         _instance = null,
     
     
     // Private functions
+    fire = function ( event, arg ) {
+        if ( !_silentMode ) {
+            _instance.fire( (_eventPrefix + event), arg );
+        }
+    },
+    
+    
     isFunction = function ( fn ) {
         return (typeof fn === "function");
     },
@@ -72,6 +81,10 @@
     
     
     execUnload = function () {
+        if ( _silentMode ) {
+            return;
+        }
+        
         // Unload currently active modules only
         for ( var i = _synced.active.length; i--; ) {
             if ( _synced.active[ i ].__registered && isFunction( _synced.active[ i ].unload ) ) {
@@ -82,6 +95,10 @@
     
     
     execOnload = function () {
+        if ( _silentMode ) {
+            return;
+        }
+        
         // Unload newly active modules only
         for ( var i = _synced.active.length; i--; ) {
             if ( _synced.active[ i ].__registered && isFunction( _synced.active[ i ].onload ) ) {
@@ -111,6 +128,10 @@
      * @fires page-controller-router-synced-modules
      */
     syncModules = function () {
+        if ( _silentMode ) {
+            return;
+        }
+        
         _synced.active = [];
         _synced.inactive = [];
     
@@ -128,7 +149,7 @@
             }
         }
     
-        _instance.fire( (_eventPrefix + "router-synced-modules"), _synced );
+        fire( "router-synced-modules", _synced );
     },
     
     
@@ -163,7 +184,7 @@
         var isSameRequest = (_currentToString === getRouteDataToString( data ));
     
         if ( isSameRequest ) {
-            _instance.fire( (_eventPrefix + "router-samepage"), data );
+            fire( "router-samepage", data );
             _isSamePage = true;
             return;
         }
@@ -171,7 +192,7 @@
         _timeBefore = Date.now();
     
         if ( !_isFirstRoute ) {
-            _instance.fire( (_eventPrefix + "router-transition-out"), data );
+            fire( "router-transition-out", data );
         }
     },
     
@@ -179,7 +200,6 @@
     /**
      * @fires page-controller-router-refresh-document
      * @fires page-controller-router-transition-in
-     * @fires page-controller-router-idle
      */
     handleRouterResponse = function ( res ) {
         if ( _isSamePage ) {
@@ -212,14 +232,24 @@
                 execUnload();
     
                 // 0.2 Refresh the document content
-                _instance.fire( (_eventPrefix + "router-refresh-document"), data.response );
+                fire( "router-refresh-document", data.response );
     
                 // 0.3 Sync modules and onload newly active ones
                 syncModules();
                 execOnload();
     
                 // 0.4 Trigger transition of content to come back in
-                _instance.fire( (_eventPrefix + "router-transition-in"), data );
+                fire( "router-transition-in", data );
+                
+                // 0.5 Check `silent` mode
+                if ( _silentMode ) {
+                    _silentMode = false;
+                    
+                    if ( isFunction( _silentCallback ) ) {
+                        _silentCallback( data );
+                        _silentCallback = null;
+                    }
+                }
     
             }, _instance._transitionTime );
         }
@@ -315,6 +345,21 @@
         } else {
             //console.log( "[PageController : page not in routes]" );
         }
+    };
+    
+    /**
+     *
+     * Trigger the router on a uri and run PageController `silently`, so no events fire.
+     * @memberof PageController
+     * @method routeSilently
+     * @param {string} uri The route to trigger
+     * @param {function} cb The optional callback to fire when done
+     *
+     */
+    PageController.prototype.routeSilently = function ( uri, cb ) {
+        _silentMode = true;
+        _silentCallback = cb;
+        _router.trigger( uri );
     };
     
     /**
@@ -418,7 +463,6 @@
         return _router;
     };
     
-    
     /**
      *
      * Returns the instances PushState
@@ -430,7 +474,6 @@
     PageController.prototype.getPusher = function () {
         return _router._pusher;
     };
-    
     
     /**
      *
@@ -444,7 +487,6 @@
         return _router._matcher;
     };
     
-    
     /**
      *
      * Returns the current route pathed
@@ -457,7 +499,6 @@
         return _currentRoute;
     };
     
-    
     /**
      *
      * Returns the current query params object
@@ -469,7 +510,6 @@
     PageController.prototype.getQuery = function () {
         return _currentQuery;
     };
-    
     
     /**
      *
@@ -491,7 +531,6 @@
     
         return ret;
     };
-    
     
     /**
      *
