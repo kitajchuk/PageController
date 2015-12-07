@@ -193,6 +193,7 @@ pageController.initPage();
 - page-controller-router-refresh-document
 - page-controller-router-transition-out
 - page-controller-router-transition-in
+- page-controller-initialized-page
 
 
 

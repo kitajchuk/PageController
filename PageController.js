@@ -222,6 +222,8 @@
             _isFirstRoute = false;
             syncModules();
             execOnload();
+
+            fire( "initialized-page", data.response );
     
         // All other Router sequences fall here
         } else {
