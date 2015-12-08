@@ -204,7 +204,6 @@ pageController.initPage();
 - [setConfig( array )](https://github.com/ProperJS/MatchRoute)
 - setModules( array )
 - addModule( object )
-- unregisterModule( object )
 - getModules()
 - getConfig()
 - [getRouter()](https://github.com/ProperJS/Router)

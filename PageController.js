@@ -14,20 +14,20 @@
  *
  */
 (function ( factory ) {
-    
+
     if ( typeof exports === "object" && typeof module !== "undefined" ) {
         module.exports = factory();
 
     } else if ( typeof window !== "undefined" ) {
         window.PageController = factory();
     }
-    
+
 })(function () {
 
     // Useful stuff
     var Router = require( "properjs-router" ),
         Controller = require( "properjs-controller" ),
-        
+
         _router = null,
         _config = [],
         _modules = [],
@@ -46,84 +46,84 @@
         _isSamePage = false,
         _silentMode = false,
         _silentCallback = null,
-    
+
         // Singleton
         _instance = null,
-    
-    
+
+
     // Private functions
     fire = function ( event, arg ) {
         if ( !_silentMode ) {
             _instance.fire( (_eventPrefix + event), arg );
         }
     },
-    
-    
+
+
     isFunction = function ( fn ) {
         return (typeof fn === "function");
     },
-    
-    
+
+
     isSameObject = function ( o1, o2 ) {
         return (JSON.stringify( o1 ) === JSON.stringify( o2 ));
     },
-    
-    
+
+
     execInit = function ( method ) {
         // One time module initialization
         for ( var i = _modules.length; i--; ) {
-            if ( _modules[ i ].__registered && !_modules[ i ].__initialized && isFunction( _modules[ i ].init ) ) {
+            if ( !_modules[ i ].__initialized && isFunction( _modules[ i ].init ) ) {
                 _modules[ i ].__initialized = true;
                 _modules[ i ].init();
             }
         }
     },
-    
-    
+
+
     execUnload = function () {
         if ( _silentMode ) {
             return;
         }
-        
+
         // Unload currently active modules only
         for ( var i = _synced.active.length; i--; ) {
-            if ( _synced.active[ i ].__registered && isFunction( _synced.active[ i ].unload ) ) {
+            if ( isFunction( _synced.active[ i ].unload ) ) {
                 _synced.active[ i ].unload();
             }
         }
     },
-    
-    
+
+
     execOnload = function () {
         if ( _silentMode ) {
             return;
         }
-        
+
         // Unload newly active modules only
         for ( var i = _synced.active.length; i--; ) {
-            if ( _synced.active[ i ].__registered && isFunction( _synced.active[ i ].onload ) ) {
+            if ( isFunction( _synced.active[ i ].onload ) ) {
                 _synced.active[ i ].onload();
             }
         }
     },
-    
-    
+
+
     getRouteDataToString = function ( data ) {
         var ret = data.uri,
             i;
-    
+
         for ( i in data.query ) {
             ret += "-" + i + "-" + data.query[ i ];
         }
-    
+
         for ( i in data.params ) {
             ret += "-" + i + "-" + data.params[ i ];
         }
-    
+
         return ret;
     },
-    
-    
+
+
     /**
      * @fires page-controller-router-synced-modules
      */
@@ -131,72 +131,72 @@
         if ( _silentMode ) {
             return;
         }
-        
+
         _synced.active = [];
         _synced.inactive = [];
-    
+
         for ( var i = _modules.length; i--; ) {
             var module = _modules[ i ];
-    
-            if ( _modules[ i ].__registered && isFunction( module.isActive ) ) {
+
+            if ( isFunction( module.isActive ) ) {
                 // isActive method should rebuild module variables
                 if ( module.isActive() ) {
                     _synced.active.push( module );
-    
+
                 } else {
                     _synced.inactive.push( module );
                 }
             }
         }
-    
+
         fire( "router-synced-modules", _synced );
     },
-    
-    
+
+
     onRouterResponse = function ( data ) {
         function __route() {
             if ( (Date.now() - _timeBefore) >= _instance._transitionTime ) {
                 _instance.stop();
-    
+
                 handleRouterResponse( data );
             }
         }
-    
+
         _instance.go( __route );
     },
-    
-    
+
+
     onPopGetRouter = function ( data ) {
         onPreGetRouter( data.request );
     
         setTimeout( function () {
             handleRouterResponse( data );
-    
+
         }, _instance._transitionTime );
     },
-    
-    
+
+
     /**
      * @fires page-controller-router-transition-out
      * @fires page-controller-router-samepage
      */
     onPreGetRouter = function ( data ) {
         var isSameRequest = (_currentToString === getRouteDataToString( data ));
-    
+
         if ( isSameRequest ) {
             fire( "router-samepage", data );
             _isSamePage = true;
             return;
         }
-    
+
         _timeBefore = Date.now();
-    
+
         if ( !_isFirstRoute ) {
             fire( "router-transition-out", data );
         }
     },
-    
-    
+
+
     /**
      * @fires page-controller-router-refresh-document
      * @fires page-controller-router-transition-in
@@ -206,17 +206,17 @@
             _isSamePage = false;
             return;
         }
-    
+
         var data = {
             response: res.response.responseText,
             request: res.request,
             status: res.status
         };
-    
+
         _currentRoute = data.request.uri;
         _currentQuery = data.request.query;
         _currentToString = getRouteDataToString( data.request );
-    
+
         // Think of this as window.onload, happens once
         if ( _isFirstRoute ) {
             _isFirstRoute = false;
@@ -224,7 +224,7 @@
             execOnload();
 
             fire( "initialized-page", data.response );
-    
+
         // All other Router sequences fall here
         } else {
             // Allow transition duration to take place
@@ -232,32 +232,32 @@
                 // 0.1 Sync modules and unload active ones
                 syncModules();
                 execUnload();
-    
+
                 // 0.2 Refresh the document content
                 fire( "router-refresh-document", data.response );
-    
+
                 // 0.3 Sync modules and onload newly active ones
                 syncModules();
                 execOnload();
-    
+
                 // 0.4 Trigger transition of content to come back in
                 fire( "router-transition-in", data );
-                
+
                 // 0.5 Check `silent` mode
                 if ( _silentMode ) {
                     _silentMode = false;
-                    
+
                     if ( isFunction( _silentCallback ) ) {
                         _silentCallback( data );
                         _silentCallback = null;
                     }
                 }
-    
+
             }, _instance._transitionTime );
         }
     };
-    
-    
+
+
     /**
      *
      * Page transition manager
@@ -277,9 +277,9 @@
         // Singleton
         if ( !_instance ) {
             _instance = this;
-    
+
             options = (options || {});
-    
+
             /**
              *
              * The duration of your transition for page content
@@ -289,7 +289,7 @@
              *
              */
             this._transitionTime = (options.transitionTime || _timeDelay);
-    
+
             /**
              *
              * The flag to anchor to top of page on transitions
@@ -304,12 +304,12 @@
                 preventDefault: true
             });
         }
-    
+
         return _instance;
     };
-    
+
     PageController.prototype = new Controller();
-    
+
     /**
      *
      * Initialize controller on page
@@ -321,9 +321,9 @@
         if ( _initialized ) {
             return;
         }
-    
+
         _initialized = true;
-    
+
         /**
          *
          * Instance of Router
@@ -331,24 +331,21 @@
          *
          */
         _router = new Router( this._routerOptions );
-    
+
         if ( _router._matcher.parse( window.location.href, _config ).matched ) {
             _router.bind();
-            
+
             for ( var i = _config.length; i--; ) {
                 _router.get( _config[ i ], onRouterResponse );
             }
-        
+
             _router.on( "preget", onPreGetRouter );
             _router.on( "popget", onPopGetRouter );
-    
+
             execInit();
-    
-        } else {
-            //console.log( "[PageController : page not in routes]" );
         }
     };
-    
+
     /**
      *
      * Trigger the router on a uri and run PageController `silently`, so no events fire.
@@ -363,7 +360,7 @@
         _silentCallback = cb;
         _router.trigger( uri );
     };
-    
+
     /**
      *
      * Set the Router configuration
@@ -375,7 +372,7 @@
     PageController.prototype.setConfig = function ( config ) {
         _config = config;
     };
-    
+
     /**
      *
      * Set the module configuration
@@ -388,12 +385,12 @@
         if ( !modules ) {
             return;
         }
-    
+
         for ( var i = modules.length; i--; ) {
             this.addModule( modules[ i ] );
         }
     };
-    
+
     /**
      *
      * Add to the module configuration
@@ -404,31 +401,13 @@
      */
     PageController.prototype.addModule = function ( module ) {
         if ( _modules.indexOf( module ) === -1 && isFunction( module.isActive ) && isFunction( module.onload ) && isFunction( module.unload ) ) {
-            module.__registered = true;
-    
             _modules.push( module );
-    
+
         } else {
             throw new Error( "PageController ERROR - All registered modules require isActive, onload and unload methods." );
         }
     };
-    
-    /**
-     *
-     * Add to the module configuration
-     * @memberof PageController
-     * @method unregisterModule
-     * @param {object} module The module object to unregister
-     *
-     */
-    PageController.prototype.unregisterModule = function ( module ) {
-        for ( var i = _modules.length; i--; ) {
-            if ( _modules[ i ] === module ) {
-                _modules[ i ].__registered = false;
-            }
-        }
-    };
-    
+
     /**
      *
      * Returns the array of modules
@@ -440,7 +419,7 @@
     PageController.prototype.getModules = function () {
         return _modules;
     };
-    
+
     /**
      *
      * Returns the MatchRoute config
@@ -452,7 +431,7 @@
     PageController.prototype.getConfig = function () {
         return _config;
     };
-    
+
     /**
      *
      * Returns the instances Router
@@ -464,7 +443,7 @@
     PageController.prototype.getRouter = function () {
         return _router;
     };
-    
+
     /**
      *
      * Returns the instances PushState
@@ -476,7 +455,7 @@
     PageController.prototype.getPusher = function () {
         return _router._pusher;
     };
-    
+
     /**
      *
      * Returns the instances MatchRoute
@@ -488,7 +467,7 @@
     PageController.prototype.getMatcher = function () {
         return _router._matcher;
     };
-    
+
     /**
      *
      * Returns the current route pathed
@@ -500,7 +479,7 @@
     PageController.prototype.getRoute = function () {
         return _currentRoute;
     };
-    
+
     /**
      *
      * Returns the current query params object
@@ -512,7 +491,7 @@
     PageController.prototype.getQuery = function () {
         return _currentQuery;
     };
-    
+
     /**
      *
      * Returns true if current page path equals slug
@@ -527,13 +506,13 @@
     PageController.prototype.is = function ( slug, looseMatch ) {
         var ret = false,
             reg;
-    
+
         reg = new RegExp( looseMatch ? ("^" + slug) : ("^" + slug + "$") );
         ret = reg.test( _currentRoute );
-    
+
         return ret;
     };
-    
+
     /**
      *
      * Flushes the current route known as `active`
@@ -544,7 +523,7 @@
     PageController.prototype.flushRoute = function () {
         _currentToString = "";
     };
-    
+
     return PageController;
 
 });
