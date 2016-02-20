@@ -46,6 +46,7 @@
         _isSamePage = false,
         _silentMode = false,
         _silentCallback = null,
+        _isRoutingActive = false,
 
         // Singleton
         _instance = null,
@@ -154,6 +155,12 @@
 
 
     onRouterResponse = function ( data ) {
+        if ( _isRoutingActive ) {
+            return;
+        }
+
+        _isRoutingActive = true;
+
         function __route() {
             if ( (Date.now() - _timeBefore) >= _instance._transitionTime ) {
                 _instance.stop();
@@ -167,6 +174,10 @@
 
 
     onPopGetRouter = function ( data ) {
+        if ( _isRoutingActive ) {
+            return;
+        }
+
         onPreGetRouter( data.request );
     
         setTimeout( function () {
@@ -181,6 +192,10 @@
      * @fires page-controller-router-samepage
      */
     onPreGetRouter = function ( data ) {
+        if ( _isRoutingActive ) {
+            return;
+        }
+
         var isSameRequest = (_currentToString === getRouteDataToString( data ));
 
         if ( isSameRequest ) {
@@ -220,6 +235,7 @@
         // Think of this as window.onload, happens once
         if ( _isFirstRoute ) {
             _isFirstRoute = false;
+            _isRoutingActive = false;
             syncModules();
             execOnload();
 
@@ -242,6 +258,8 @@
 
                 // 0.4 Trigger transition of content to come back in
                 fire( "router-transition-in", data );
+
+                _isRoutingActive = false;
 
                 // 0.5 Check `silent` mode
                 if ( _silentMode ) {
