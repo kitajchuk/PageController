@@ -219,6 +219,7 @@
     handleRouterResponse = function ( res ) {
         if ( _isSamePage ) {
             _isSamePage = false;
+            _isRoutingActive = false;
             return;
         }
 
