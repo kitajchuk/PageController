@@ -240,7 +240,7 @@
             syncModules();
             execOnload();
 
-            fire( "initialized-page", data.response );
+            fire( "initialized-page", data );
 
         // All other Router sequences fall here
         } else {
