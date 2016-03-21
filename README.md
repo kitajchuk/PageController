@@ -153,28 +153,51 @@ export default feed;
 ### Event Listeners
 ```javascript
 // Hook into page controller events
-pageController.on( "page-controller-router-transition-out", function () {
+pageController.on( "page-controller-router-transition-out", function ( data ) {
     // Transition out your page
     // This is a great place for CSS class-hooks to achieve nice page transitions
 });
 
 
-pageController.on( "page-controller-router-refresh-document", function ( html ) {
+pageController.on( "page-controller-router-refresh-document", function ( data ) {
     // Refresh the document content for the new page
     // You'll need to parse your content from the responseText string
 });
 
 pageController.on( "page-controller-router-transition-in", function ( data ) {
     // Transition in your page back in after the content is updated
-    // data.status          => number
-    // data.response        => string html
-    // data.request         => object
-    // data.request.query   => object
-    // data.request.params  => object
-    // data.request.uri     => string
-    // data.request.route   => string
-    // data.request.matched => boolean
 });
+```
+
+### Data model
+```javascript
+{
+    // Request response code
+    status: number,
+
+    // Request response text
+    response: string,
+
+    // MatchRoute data object
+    request: {
+        // Query string mapping
+        query: object,
+
+        // Match uri mapping
+        params: object,
+
+        // Matched uri segment(s)
+        uri: string,
+
+        // Config route uri matched
+        // When using "*" as route config, this will always be "*"
+        route: string,
+
+        // Whether uri was matched to route config
+        matched: boolean
+    }
+}
+
 ```
 
 ### Initialize
@@ -188,7 +211,6 @@ pageController.initPage();
 
 ## Events
 - page-controller-router-samepage
-- page-controller-router-preget
 - page-controller-router-synced-modules
 - page-controller-router-refresh-document
 - page-controller-router-transition-out
@@ -199,7 +221,6 @@ pageController.initPage();
 
 ## Methods
 - on( event, callback )
-- is( slug, looseMatch )
 - initPage()
 - [setConfig( array )](https://github.com/ProperJS/MatchRoute)
 - setModules( array )
@@ -211,5 +232,4 @@ pageController.initPage();
 - [getMatcher()](https://github.com/ProperJS/MatchRoute)
 - getRoute()
 - getQuery()
-- flushRoute()
 - routeSilently( uri, callback )

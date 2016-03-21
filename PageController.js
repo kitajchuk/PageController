@@ -199,7 +199,9 @@
         var isSameRequest = (_currentToString === getRouteDataToString( data ));
 
         if ( isSameRequest ) {
-            fire( "router-samepage", data );
+            fire( "router-samepage", {
+                request: data
+            });
             _isSamePage = true;
             return;
         }
@@ -207,7 +209,9 @@
         _timeBefore = Date.now();
 
         if ( !_isFirstRoute ) {
-            fire( "router-transition-out", data );
+            fire( "router-transition-out", {
+                request: data
+            });
         }
     },
 
@@ -251,7 +255,7 @@
                 execUnload();
 
                 // 0.2 Refresh the document content
-                fire( "router-refresh-document", data.response );
+                fire( "router-refresh-document", data );
 
                 // 0.3 Sync modules and onload newly active ones
                 syncModules();
@@ -509,38 +513,6 @@
      */
     PageController.prototype.getQuery = function () {
         return _currentQuery;
-    };
-
-    /**
-     *
-     * Returns true if current page path equals slug
-     * Loose match if no second parameter is passed
-     * @memberof PageController
-     * @method is
-     * @param {string} slug The page slug to check
-     * @param {boolean} looseMatch Perform a less strict match
-     * @returns boolean
-     *
-     */
-    PageController.prototype.is = function ( slug, looseMatch ) {
-        var ret = false,
-            reg;
-
-        reg = new RegExp( looseMatch ? ("^" + slug) : ("^" + slug + "$") );
-        ret = reg.test( _currentRoute );
-
-        return ret;
-    };
-
-    /**
-     *
-     * Flushes the current route known as `active`
-     * @memberof PageController
-     * @method flushRoute
-     *
-     */
-    PageController.prototype.flushRoute = function () {
-        _currentToString = "";
     };
 
     return PageController;
