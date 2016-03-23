@@ -11,6 +11,9 @@ PageController
 npm install properjs-pagecontroller --save-dev
 ```
 
+## About
+PageController is a wrapper around [Router](https://github.com/ProperJS/Router) which in turn takes advantage of [PushState](https://github.com/ProperJS/PushState) for simple history management piped back up to the Router.
+
 
 ## Usage
 
@@ -19,22 +22,16 @@ Create a new instance of PageController.
 ```javascript
 var PageController = require( "properjs-pagecontroller" ),
     pageController = new PageController({
-        // How long are your transitions between pages?
-        // If a request happens faster than your beautiful transitions,
-        // the page controller will still wait until your duration is up to
-        // fire off the transition-in sequence.
-        transitionTime: 600,
+        // Transition duration for page animations in milliseconds.
+        // The default transition-time is 0 to just handle the request cycle.
+        // Why have this? If you want nice transitions you'll use it.
+        // Say your request is fast, like 10ms or whatever, this will ensure
+        // that your transitionTime is still honored allowing exit/intro animations.
+        transitionTime: 200,
     
         // Router options
-        // These are the defaults that PageController uses
-        async: true,
-        caching: true,
-        preventDefault: true,
-
-        // Run PageController as a proxy
-        proxy: {
-            domain: "your.proxy.domain"
-        }
+        // @see: https://github.com/ProperJS/Router
+        routerOptions: {}
     });
 ```
 

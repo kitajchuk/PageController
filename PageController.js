@@ -37,7 +37,7 @@
         },
         _initialized = false,
         _timeBefore = null,
-        _timeDelay = 600,
+        _timeDelay = 0,
         _eventPrefix = "page-controller-",
         _currentRoute = null,
         _isFirstRoute = true,
@@ -162,7 +162,7 @@
         _isRoutingActive = true;
 
         function __route() {
-            if ( (Date.now() - _timeBefore) >= _instance._transitionTime ) {
+            if ( (Date.now() - _timeBefore) >= _instance._options.transitionTime ) {
                 _instance.stop();
 
                 handleRouterResponse( data );
@@ -183,7 +183,7 @@
         setTimeout( function () {
             handleRouterResponse( data );
 
-        }, _instance._transitionTime );
+        }, _instance._options.transitionTime );
     },
 
 
@@ -276,7 +276,7 @@
                     }
                 }
 
-            }, _instance._transitionTime );
+            }, _instance._options.transitionTime );
         }
     };
 
@@ -291,8 +291,8 @@
      * @memberof! <global>
      * @param {object} options Settings for control features
      * <ul>
-     * <li>transitionTime - Number</li>
-     * <li>routerOptions - Object</li>
+     * <li>transitionTime</li>
+     * <li>routerOptions</li>
      * </ul>
      *
      */
@@ -301,35 +301,33 @@
         if ( !_instance ) {
             _instance = this;
 
-            options = (options || {});
-
             /**
              *
-             * The duration of your transition for page content
-             * @memberof PageController
-             * @member _transitionTime
-             * @private
-             *
-             */
-            this._transitionTime = (options.transitionTime || _timeDelay);
-
-            /**
-             *
-             * The default options passed to Router
-             * @memberof PageController
+             * The default options
+             * @memberof _options
              * @member _routerOptions
              * @private
              *
              */
-            this._routerOptions = {
-                async: true,
-                caching: true,
-                preventDefault: true
+            this._options = {
+                transitionTime: _timeDelay,
+                routerOptions: {
+                    pushStateOptions: {}
+                }
             };
-            
-            // Handle merging options for Router, like `proxy`
-            for ( var i in options ) {
-                this._routerOptions[ i ] = options[ i ];
+
+            // Normalize usage options passed in
+            options = (options || {});
+
+            // Merge usage options with defaults
+            if ( options.transitionTime ) {
+                this._options.transitionTime = options.transitionTime;
+            }
+
+            if ( options.routerOptions ) {
+                for ( var i in options.routerOptions ) {
+                    this._options.routerOptions[ i ] = options.routerOptions[ i ];
+                }
             }
         }
 
@@ -358,7 +356,7 @@
          * @private
          *
          */
-        _router = new Router( this._routerOptions );
+        _router = new Router( this._options.routerOptions );
 
         if ( _router._matcher.parse( window.location.href, _config ).matched ) {
             _router.bind();
