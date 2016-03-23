@@ -27,10 +27,13 @@ var PageController = require( "properjs-pagecontroller" ),
     
         // Router options
         // These are the defaults that PageController uses
-        routerOptions: {
-            async: true,
-            caching: true,
-            preventDefault: true
+        async: true,
+        caching: true,
+        preventDefault: true,
+
+        // Run PageController as a proxy
+        proxy: {
+            domain: "your.proxy.domain"
         }
     });
 ```

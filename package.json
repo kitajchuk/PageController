@@ -2,7 +2,7 @@
     "title": "PageController",
     "name": "properjs-pagecontroller",
     "description": "Lightweight, async web app management with routing and history.",
-    "version": "0.3.9",
+    "version": "0.3.10",
     "homepage": "https://github.com/ProperJS/PageController",
     "readmeFilename": "README.md",
     "contributors": [

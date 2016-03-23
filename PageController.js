@@ -315,17 +315,22 @@
 
             /**
              *
-             * The flag to anchor to top of page on transitions
+             * The default options passed to Router
              * @memberof PageController
              * @member _routerOptions
              * @private
              *
              */
-            this._routerOptions = (options.routerOptions || {
+            this._routerOptions = {
                 async: true,
                 caching: true,
                 preventDefault: true
-            });
+            };
+            
+            // Handle merging options for Router, like `proxy`
+            for ( var i in options ) {
+                this._routerOptions[ i ] = options[ i ];
+            }
         }
 
         return _instance;
