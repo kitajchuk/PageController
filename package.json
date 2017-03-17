@@ -1,8 +1,8 @@
 {
     "title": "PageController",
     "name": "properjs-pagecontroller",
-    "description": "Lightweight, async web app management with routing and history.",
-    "version": "0.4.1",
+    "description": "A lightweight, modern javascript router.",
+    "version": "0.4.2",
     "homepage": "https://github.com/ProperJS/PageController",
     "readmeFilename": "README.md",
     "contributors": [
@@ -38,7 +38,8 @@
         "properjs",
         "router",
         "history",
-        "pushState"
+        "pushState",
+        "mvc"
     ],
     "devDependencies": {
       "browser-sync": "^2.18.8",
