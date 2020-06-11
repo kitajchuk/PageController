@@ -1,21 +1,36 @@
-var PageController = require( "../PageController" );
-var controller = new PageController();
+import PageController from "../PageController";
 
-controller.setConfig( ["*"] );
-controller.setModules( [] );
-controller.on( "page-controller-router-samepage", function () {
-    console.log( "samepage" );
+const pageController = new PageController({
+    transitionTime: 0, // Default
+    routerOptions: { // Default
+        historyOptions: {},
+    },
+    routes: ["*"], // Default
 });
-controller.on( "page-controller-router-transition-out", function () {
-    console.log( "out" );
+
+pageController.on( "samepage", ( data ) => {
+    console.log( "samepage", data );
 });
-controller.on( "page-controller-router-refresh-document", function () {
-    console.log( "refresh" );
+
+pageController.on( "document", ( data ) => {
+    console.log( "document", data );
 });
-controller.on( "page-controller-router-transition-in", function () {
-    console.log( "in" );
+
+pageController.on( "transition-out", ( data ) => {
+    console.log( "transition-out", data );
 });
-controller.on( "page-controller-initialized-page", function () {
-    console.log( "init" );
+
+pageController.on( "transition-in", ( data ) => {
+    console.log( "transition-in", data );
 });
-controller.initPage();
+
+pageController.on( "initialized", ( data ) => {
+    console.log( "initialized", data );
+});
+
+pageController.bind();
+
+setTimeout(() => {
+    pageController.routeSilently( "http://localhost:9999/another/route" );
+
+}, 2000 );
